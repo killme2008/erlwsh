@@ -114,7 +114,9 @@ loop(NameField, Response,Binding ,N ) ->
                    _:Why->
                        Response:write_chunk(io_lib:format("~p</br>",[Why]) ++ get_form(NameField,N+1)), 
 	               loop(NameField,Response,Binding,N+1)
-            end          
+            end;     
+	_ ->
+           loop(NameField,Response,Binding,N)
     end.
 
 get_option(Option, Options) ->
