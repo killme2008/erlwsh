@@ -88,12 +88,11 @@ get_name_field(Name)->
      io_lib:format("<input type='hidden' name='name' value=~p/>",[Name]).
 
 get_form(NameField,N)->
-    io_lib:format("~p&gt;<form name='form~p' onsubmit='return false;'>
-              <input name='str' type='text' size='%100'
+    io_lib:format("<form name='form~p' id='form~p' onsubmit='return false;'>
+              ~p&gt;<input name='str' type='text' size='%100'
               style='border-top-style:none;border-right-style:none;border-left-style:none;border-bottom-style:1px;'
               onkeydown='post_str(event)'/>
-              <script type='text/javascript' language='javascript'> $('form~p').str.focus(); </script>
-              ",[N,N,N]) ++
+              <script type='text/javascript' language='javascript'>$('form~p').str.focus(); </script>",[N,N,N,N]) ++
                NameField ++
               " </form>".
 
