@@ -4,8 +4,8 @@
 %% @doc Web server for erlwsh.
 
 -module(erlwsh_web).
--author('author <author@example.com>').
-
+-author('dennis <killme2008@gmail.com>').
+-vsn('0.01').
 -export([start/1, stop/0, loop/2]).
 
 %% External API
