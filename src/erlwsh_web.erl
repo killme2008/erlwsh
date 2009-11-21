@@ -32,7 +32,7 @@ loop(Req, DocRoot) ->
                     Name=list_to_atom(Addr ++ ":" ++ Port),
                     register(Name,self()),
                     N=1,
-                    NameField=get_name_field(Name),                
+                    NameField=get_name_field(Name),
                     Response = Req :ok ( { "text/html; charset=utf-8" ,
                                      [ { "Server" ,"Erlang-web-shell" } ] ,
                                      chunked} ) ,
@@ -76,7 +76,7 @@ loop(Req, DocRoot) ->
                    Str=proplists:get_value("str",Params),
                    Pid=list_to_atom(proplists:get_value("name",Params)),
                    Pid ! {post_msg,Str},
-                   Req:ok({"text/plain", "success"});                   
+                   Req:ok({"text/plain", "success"});
                 _ ->
                     Req:not_found()
             end;
@@ -91,13 +91,11 @@ get_form(NameField,N)->
     io_lib:format("<form name='form~p' id='form~p' onsubmit='return false;'>
               ~p&gt;<input name='str' type='text' size='%100'
               style='border-top-style:none;border-right-style:none;border-left-style:none;border-bottom-style:1px;'
-              onkeydown='post_str(event)'/>
-              <script type='text/javascript' language='javascript'>$('form~p').str.focus(); </script>",[N,N,N,N]) ++
-               NameField ++
-              " </form>".
+              onkeydown='post_str(event)'/>" ++ NameField ++
+              " </form> <script type='text/javascript' language='javascript'>$('form~p').str.focus(); </script>",[N,N,N,N]).
 
 get_port(Socket) ->
-    case inet:peername(Socket) of       
+    case inet:peername(Socket) of
         {ok, {_Addr, Port}} ->
             Port
     end.
@@ -108,14 +106,14 @@ loop(NameField, Response,Binding ,N ) ->
         {post_msg,Str}->
              try eshell:eval(Str,Binding) of
                 {value,Value,NewBinding} ->
-                       Response:write_chunk(io_lib:format("~p</br>",[Value]) ++ get_form(NameField,N+1)), 
-	               loop(NameField,Response,NewBinding,N+1)
+                       Response:write_chunk(io_lib:format("~p</br>",[Value]) ++ get_form(NameField,N+1)),
+                   loop(NameField,Response,NewBinding,N+1)
              catch
                    _:Why->
-                       Response:write_chunk(io_lib:format("~p</br>",[Why]) ++ get_form(NameField,N+1)), 
-	               loop(NameField,Response,Binding,N+1)
-            end;     
-	_ ->
+                       Response:write_chunk(io_lib:format("~p</br>",[Why]) ++ get_form(NameField,N+1)),
+                   loop(NameField,Response,Binding,N+1)
+            end;
+    _ ->
            loop(NameField,Response,Binding,N)
     end.
 
