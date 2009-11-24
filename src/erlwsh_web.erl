@@ -30,6 +30,7 @@ loop(Req, DocRoot) ->
                     Addr=Req:get(peer),
                     Port=integer_to_list(get_port(Socket)),
                     Name=list_to_atom(Addr ++ ":" ++ Port),
+                    %Register process as ip:port name
                     register(Name,self()),
                     N=1,
                     NameField=get_name_field(Name),
@@ -73,9 +74,13 @@ loop(Req, DocRoot) ->
             case Path of
                "shell" ->
                    Params=Req:parse_post(),
-                   Str=proplists:get_value("str",Params),
                    Pid=list_to_atom(proplists:get_value("name",Params)),
-                   Pid ! {post_msg,Str},
+                   case string:strip(proplists:get_value("str",Params)) of
+                      "halt()."  ->
+                                    Pid ! {client,exit};
+                        Str      ->
+                                    Pid ! {post_msg,Str}
+                   end,
                    Req:ok({"text/plain", "success"});
                 _ ->
                     Req:not_found()
@@ -103,6 +108,14 @@ get_port(Socket) ->
 %% Internal API
 loop(NameField, Response,Binding ,N ) ->
     receive
+        {client,exit} ->
+                    Response:write_chunk("<script type='text/javascript' language='javascript'>
+                                          alert('Erlang web shell exit');
+                                          window.close();
+                                          </script></body></html>"),
+                    timer:sleep(100),
+                    Response:write_chunk(""),
+                    ok;
         {post_msg,Str}->
              try eshell:eval(Str,Binding) of
                 {value,Value,NewBinding} ->
@@ -113,7 +126,7 @@ loop(NameField, Response,Binding ,N ) ->
                        Response:write_chunk(io_lib:format("~p</br>",[Why]) ++ get_form(NameField,N+1)),
                    loop(NameField,Response,Binding,N+1)
             end;
-    _ ->
+        _ ->
            loop(NameField,Response,Binding,N)
     end.
 
