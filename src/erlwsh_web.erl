@@ -74,7 +74,7 @@ loop(Req, DocRoot) ->
             case Path of
                "shell" ->
                    Params=Req:parse_post(),
-                   Pid=list_to_atom(proplists:get_value("name",Params)),
+                   Pid=erlang:list_to_existing_atom(proplists:get_value("name",Params)),
                    case string:strip(proplists:get_value("str",Params)) of
                       "halt()."  ->
                                     Pid ! {client,exit};
