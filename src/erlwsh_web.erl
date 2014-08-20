@@ -111,7 +111,7 @@ loop(NameField, Response,Binding ,N ) ->
         {client,exit} ->
                     Response:write_chunk("<script type='text/javascript' language='javascript'>
                                           alert('Erlang web shell exit');
-                                          window.close();-
+                                          window.close();
                                           </script></body></html>"),
                     timer:sleep(100),
                     Response:write_chunk(""),
